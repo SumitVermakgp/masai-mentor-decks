@@ -27,22 +27,13 @@
 
   <!-- MAIN -->
   <main class="mx-auto max-w-5xl px-4 py-8">
-    <!-- Controls -->
-    <div class="mb-6 grid gap-3 md:grid-cols-3">
-      <div class="md:col-span-2">
-        <label class="block text-sm font-medium mb-1" for="search">Search sessions</label>
-        <input
-          id="search"
-          type="search"
-          placeholder="Search by title, tag, or description…"
-          class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
+    <!-- Sort Control -->
+    <div class="mb-6 flex justify-end">
       <div>
-        <label class="block text-sm font-medium mb-1" for="sort">Sort</label>
+        <label class="block text-sm font-medium mb-1" for="sort">Sort by</label>
         <select
           id="sort"
-          class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-48 rounded-xl border border-slate-300 bg-white px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="date-desc">Newest first</option>
           <option value="date-asc">Oldest first</option>
@@ -54,8 +45,7 @@
 
     <!-- Sessions grid -->
     <div id="grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
-
-    <p id="empty" class="hidden mt-10 text-center text-slate-500">No sessions match your search.</p>
+    <p id="empty" class="hidden mt-10 text-center text-slate-500">No sessions found.</p>
 
     <footer class="mt-12 text-center text-xs text-slate-500">
       <p>Built with ❤️ for learners. Last updated <span id="last-updated"></span>.</p>
@@ -63,45 +53,36 @@
   </main>
 
   <script>
-    // Session metadata
+    // Sessions list — only title, URL & date
     const sessions = [
       {
         id: 1,
         title: "Session 1 — Coding Fluency & Workflow Essentials",
         url: "./session-1/",
-        description: "Getting started with Jupyter, utils modules, Git and workflow habits.",
-        date: "2025-10-16",
-        tags: ["intro", "workflow", "git", "jupyter"]
+        date: "2025-10-16"
       },
       {
         id: 2,
-        title: "Session 2 — Workflow & Git Basics",
+        title: "Session 2 — Workflow Basics",
         url: "./session-2/",
-        description: "Jupyter fluency, utility modules, Git workflow and debugging.",
-        date: "2025-10-17",
-        tags: ["git", "pytest", "jupyter"]
+        date: "2025-10-17"
       },
       {
         id: 3,
-        title: "Session 3 — TBD",
+        title: "Session 3 — Wokflow and Version Control",
         url: "./session-3/",
-        description: "Placeholder deck for upcoming content.",
-        date: "2025-10-23",
-        tags: ["tbd"]
+        date: "2025-10-23"
       },
       {
         id: 4,
-        title: "Session 4 — (Today’s Class)",
+        title: "Session 4 — Version Control in Teams",
         url: "./session-4/",
-        description: "Placeholder — deck will be added after today’s session.",
-        date: "2025-10-24",
-        tags: ["tbd"]
+        date: "2025-10-24"
       }
     ];
 
     const grid = document.getElementById('grid');
     const empty = document.getElementById('empty');
-    const search = document.getElementById('search');
     const sortSel = document.getElementById('sort');
 
     function render(list) {
@@ -126,12 +107,6 @@
             <h3 class="text-lg font-semibold leading-snug">${s.title}</h3>
             <span class="text-xs text-slate-500">${dateStr}</span>
           </div>
-          <p class="mt-2 text-sm text-slate-600">${s.description || ''}</p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            ${(s.tags || [])
-              .map(t => `<span class="text-[11px] rounded-full bg-slate-100 px-2 py-1 text-slate-700">${t}</span>`)
-              .join('')}
-          </div>
           <div class="mt-4 text-sm font-medium text-indigo-600">Open deck →</div>
         `;
         grid.appendChild(card);
@@ -139,12 +114,7 @@
     }
 
     function apply() {
-      const q = (search.value || '').trim().toLowerCase();
-      let list = sessions.filter(s => {
-        const hay = [s.title, s.description || '', ...(s.tags || [])].join(' ').toLowerCase();
-        return hay.includes(q);
-      });
-
+      let list = [...sessions];
       const val = sortSel.value;
       list.sort((a, b) => {
         if (val === 'title-asc') return a.title.localeCompare(b.title);
@@ -152,11 +122,9 @@
         if (val === 'date-asc') return new Date(a.date) - new Date(b.date);
         return new Date(b.date) - new Date(a.date); // default newest first
       });
-
       render(list);
     }
 
-    search.addEventListener('input', apply);
     sortSel.addEventListener('change', apply);
     apply();
 
